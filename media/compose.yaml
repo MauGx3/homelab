@@ -17,7 +17,6 @@ networks:
         - subnet: 172.39.0.0/24
 
 services:
-  # airvpn recommended (referral url: https://airvpn.org/?referred_by=673908)
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -36,11 +35,11 @@ services:
     environment:
       - HTTPPROXY=on
       - SHADOWSOCKS=on
-      - TZ=America/Sao_Paulo
-      - VPN_SERVICE_PROVIDER=custom
-      - OPENVPN_CUSTOM_CONFIG=/gluetun/hotspotshield.ovpn
-      - OPENVPN_USER=ROI2T5J6IZC5QKN6T4DYZLMFHBIFKJUU
-      - OPENVPN_PASSWORD=7-KImtKGFB356gYCQQJKwywvq4tB25RI
+      - TZ={TZ}
+      - VPN_SERVICE_PROVIDER={VPN_SERVICE_PROVIDER}
+      - OPENVPN_CUSTOM_CONFIG={OPENVPN_CUSTOM_CONFIG}
+      - OPENVPN_USER={OPENVPN_USER}
+      - OPENVPN_PASSWORD={OPENVPN_PASSWORD}
       - DOT=off
       - DNS_PLAINTEXT_ADDRESS=1.1.1.1
       - DNS_KEEP_NAMESERVER=on
@@ -197,35 +196,34 @@ services:
         ipv4_address: 172.39.0.6
 
 # Newer additions to this stack feel. Remove the '#' to add the service.
-#
-#  ytdl-sub:
-#    image: ghcr.io/jmbannon/ytdl-sub:latest
-#    container_name: ytdl-sub
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - TZ=${TZ}
-#      - DOCKER_MODS=linuxserver/mods:universal-cron
-#    volumes:
-#      - ./ytdl-sub:/config
-#      - /data/youtube:/youtube
-#    networks:
-#      servarrnetwork:
-#        ipv4_address: 172.39.0.8
-#    restart: unless-stopped
-#
-#  jellyseerr:
-#    container_name: jellyseerr
-#    image: fallenbagel/jellyseerr:latest
-#    environment:
-#      - PUID=${PUID}
-#      - PGID=${PGID}
-#      - TZ=${TZ}
-#    volumes:
-#      - ./jellyseerr:/app/config
-#    ports:
-#      - 5055:5055
-#    networks:
-#      servarrnetwork:
-#        ipv4_address: 172.39.0.9
-#    restart: unless-stopped
+  ytdl-sub:
+    image: ghcr.io/jmbannon/ytdl-sub:latest
+    container_name: ytdl-sub
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:universal-cron
+    volumes:
+      - ./ytdl-sub:/config
+      - /data/youtube:/youtube
+    networks:
+      servarrnetwork:
+        ipv4_address: 172.39.0.8
+    restart: unless-stopped
+  #
+  jellyseerr:
+    container_name: jellyseerr
+    image: fallenbagel/jellyseerr:latest
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./jellyseerr:/app/config
+    ports:
+      - 5055:5055
+    networks:
+      servarrnetwork:
+        ipv4_address: 172.39.0.9
+    restart: unless-stopped
