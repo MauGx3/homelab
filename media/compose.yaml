@@ -23,28 +23,31 @@ services:
     container_name: gluetun
     cap_add:
       - NET_ADMIN
+      - SYS_MODULE
+      - NET_RAW
     devices:
-      - /dev/net/tun:/dev/net/tun # If running on an LXC see readme for more info.
-    networks:
-      servarrnetwork:
-        ipv4_address: 172.39.0.2
+      - /dev/net/tun:/dev/net/tun
     ports:
-      - ${FIREWALL_VPN_INPUT_PORTS}:${FIREWALL_VPN_INPUT_PORTS} # airvpn forwarded port, pulled from .env
-      - 8080:8080 # qbittorrent web interface
-      - 6881:6881 # qbittorrent torrent port
-      - 6789:6789 # nzbget
-      - 9696:9696 # prowlarr
+      - 8888:8888/tcp
+      - 8388:8388/tcp
+      - 8388:8388/udp
     volumes:
-      - ./gluetun:/gluetun
-    # Make a '.env' file in the same directory.
-    env_file:
-      - .env
-    healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      interval: 20s
-      timeout: 10s
-      retries: 5
+      - /share/docker/gluetun:/gluetun
+    environment:
+      - HTTPPROXY=on
+      - SHADOWSOCKS=on
+      - TZ=America/Sao_Paulo
+      - VPN_SERVICE_PROVIDER=custom
+      - OPENVPN_CUSTOM_CONFIG=/gluetun/hotspotshield.ovpn
+      - OPENVPN_USER=ROI2T5J6IZC5QKN6T4DYZLMFHBIFKJUU
+      - OPENVPN_PASSWORD=7-KImtKGFB356gYCQQJKwywvq4tB25RI
+      - DOT=off
+      - DNS_PLAINTEXT_ADDRESS=1.1.1.1
+      - DNS_KEEP_NAMESERVER=on
+      - HEALTH_TARGET_ADDRESS=1.1.1.1:53
+      - HEALTH_VPN_DURATION_INITIAL=30s
     restart: unless-stopped
+    network_mode: bridge
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
