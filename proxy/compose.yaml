@@ -36,14 +36,14 @@ services:
       - TWINGATE_ACCESS_TOKEN=<ACCESS TOKEN>
       - TWINGATE_REFRESH_TOKEN=<REFRESH TOKEN>
 
-# For testing the proxy
+  # For testing the proxy
   helloworld:
     image: 'karthequian/helloworld:latest'
     container_name: helloworld
     restart: unless-stopped
     ports:
       - 8888:80/tcp
-      
+
 volumes:
   data:
   letsencrypt:
