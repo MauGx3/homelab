@@ -9,44 +9,46 @@
 # https://github.com/TechHutTV/homelab/tree/main/media#docker-compose-and-env
 #############################################################################
 
-# networks:
-#   servarrnetwork:
-#     name: servarrnetwork
-#     ipam:
-#       config:
-#         - subnet: 172.39.0.0/24
+networks:
+  servarrnetwork:
+    name: servarrnetwork
+    ipam:
+      config:
+        - subnet: 172.29.60.0/22
 
 services:
-  # gluetun:
-  #   image: qmcgaw/gluetun
-  #   container_name: gluetun
-  #   cap_add:
-  #     - NET_ADMIN
-  #     - SYS_MODULE
-  #     - NET_RAW
-  #   devices:
-  #     - /dev/net/tun:/dev/net/tun
-  #   ports:
-  #     - 8888:8888/tcp
-  #     - 8388:8388/tcp
-  #     - 8388:8388/udp
-  #   volumes:
-  #     - /share/docker/gluetun:/gluetun
-  #   environment:
-  #     - HTTPPROXY=on
-  #     - SHADOWSOCKS=on
-  #     - TZ={TZ}
-  #     - VPN_SERVICE_PROVIDER={VPN_SERVICE_PROVIDER}
-  #     - OPENVPN_CUSTOM_CONFIG={OPENVPN_CUSTOM_CONFIG}
-  #     - OPENVPN_USER={OPENVPN_USER}
-  #     - OPENVPN_PASSWORD={OPENVPN_PASSWORD}
-  #     - DOT=off
-  #     - DNS_PLAINTEXT_ADDRESS=1.1.1.1
-  #     - DNS_KEEP_NAMESERVER=on
-  #     - HEALTH_TARGET_ADDRESS=1.1.1.1:53
-  #     - HEALTH_VPN_DURATION_INITIAL=30s
-  #   restart: unless-stopped
-  #   network_mode: bridge
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - ${FIREWALL_VPN_INPUT_PORTS}:${FIREWALL_VPN_INPUT_PORTS} # airvpn forwarded port, pulled from .env
+      - 9865:9865 # qbittorrent web interface
+      - 6888:6888 # qbittorrent torrent port
+      # - 6789:6789 # nzbget
+      - 9696:9696 # prowlarr
+    volumes:
+      - /share/docker/gluetun:/gluetun
+    environment:
+      - HTTPPROXY=on
+      - SHADOWSOCKS=on
+      - TZ=America/Sao_Paulo
+      - VPN_SERVICE_PROVIDER=custom
+      - OPENVPN_CUSTOM_CONFIG=/gluetun/hotspotshield.ovpn
+      - OPENVPN_USER=ROI2T5J6IZC5QKN6T4DYZLMFHBIFKJUU
+      - OPENVPN_PASSWORD=7-KImtKGFB356gYCQQJKwywvq4tB25RI
+      - DOT=off
+      - DNS_PLAINTEXT_ADDRESS=1.1.1.1
+      - DNS_KEEP_NAMESERVER=on
+      - HEALTH_TARGET_ADDRESS=1.1.1.1:53
+      - HEALTH_VPN_DURATION_INITIAL=${HEALTH_VPN_DURATION_INITIAL}
+    restart: unless-stopped
+    network_mode: bridge
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
@@ -58,11 +60,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080 # must match "qbittorrent web interface" port number in gluetun's service above
+      - WEBUI_PORT=9865 # must match "qbittorrent web interface" port number in gluetun's service above
       - TORRENTING_PORT=${FIREWALL_VPN_INPUT_PORTS} # airvpn forwarded port, pulled from .env
     volumes:
-      - ./qbittorrent:/config
-      - /data:/data
+      - /share/docker/qbittorrent:/config:rw
+      - /share/docker/downloads:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
@@ -139,7 +141,7 @@ services:
       - 8989:8989
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.3
+        ipv4_address: 172.29.60.3
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -151,13 +153,14 @@ services:
       - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./radarr:/config
-      - /data:/data
+      - /share/video/movies:/movies:rw
+      - /share/downloads:/downloads:rw
+      - /share/docker/radarr/config:/config:rw
     ports:
       - 7878:7878
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.4
+        ipv4_address: 172.29.60.4
 
   lidarr:
     container_name: lidarr
@@ -175,7 +178,7 @@ services:
       - 8686:8686
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.5
+        ipv4_address: 172.29.60.5
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
@@ -187,15 +190,17 @@ services:
       - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./bazarr:/config
-      - /data:/data
+      - /share/docker/bazarr:/config:rw
+      - /share/video/Filmes:/movies:rw
+      - /share/video/Séries:/tv:rw
+      - /share/video/anime:/anime:rw
     ports:
       - 6767:6767
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.6
+        ipv4_address: 172.29.60.6
 
-# Newer additions to this stack feel. Remove the '#' to add the service.
+  # Newer additions to this stack feel. Remove the '#' to add the service.
   ytdl-sub:
     image: ghcr.io/jmbannon/ytdl-sub:latest
     container_name: ytdl-sub
@@ -209,7 +214,7 @@ services:
       - /data/youtube:/youtube
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.8
+        ipv4_address: 172.29.60.8
     restart: unless-stopped
   #
   jellyseerr:
@@ -225,5 +230,5 @@ services:
       - 5055:5055
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.9
+        ipv4_address: 172.29.60.9
     restart: unless-stopped
