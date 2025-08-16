@@ -1,0 +1,92 @@
+version: "3.9"
+
+volumes:
+  mysql_data:
+
+networks:
+  game-network:
+    driver: bridge
+
+services:
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
+    privileged: true
+    user: 1000:100
+    networks:
+      - game-network
+    environment:
+      - DB_HOST=romm-db
+      - DB_NAME=romm
+      - DB_USER=maugx3
+      - DB_PASSWD=Teal208teal208
+      - ROMM_AUTH_SECRET_KEY=91a5a3672dfd53d1397c4d2bb69054853773e446b3977970a3efdc656605e835
+      - IGDB_CLIENT_ID=1g8fp92s2ongrja83ij1hxjo6ito2c
+      - IGDB_CLIENT_SECRET=eq21oxj42b1lyx06rzs3ps4871jg9b
+      - SCREENSCRAPER_USER=MauGx3
+      - SCREENSCRAPER_PASSWORD=syLs8C7g6cy8k69y
+      - RETROACHIEVEMENTS_API_KEY=LQxbYcxY9EgrOP7z7WQVo1IjV5TTvjJS
+      - STEAMGRIDDB_API_KEY=57b0e5c539b29f20ce61073aa759bdb6
+      - HASHEOUS_API_ENABLED=true
+      - HTTPX_TIMEOUT=30
+      - REQUEST_TIMEOUT=30
+    volumes:
+      - /share/docker/romm/resources:/romm/resources
+      - /share/docker/romm/redis-data:/redis-data
+      - /share/games:/romm/library
+      - /share/games/assets:/romm/assets
+      - /share/docker/romm/config:/romm/config
+    ports:
+      - 8321:8080
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    depends_on:
+      romm-db:
+        condition: service_healthy
+        restart: true
+
+  romm-db:
+    image: mariadb:latest
+    container_name: romm-db
+    restart: unless-stopped
+    privileged: true
+    networks:
+      - game-network
+    environment:
+      - MARIADB_ROOT_PASSWORD=Teal208teal208!
+      - MARIADB_DATABASE=romm
+      - MARIADB_USER=maugx3
+      - MARIADB_PASSWORD=Teal208teal208
+    ports:
+      - 3309:3306
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    volumes:
+      - /share/docker/mariadb-romm/sql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 30s
+      start_interval: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  igir:
+    image: igir-custom:latest
+    container_name: igir
+    privileged: true
+    networks:
+      - game-network
+    working_dir: /data
+    volumes:
+      - /share/games/igir-romm-cleanup.sh:/data/igir-romm-cleanup.sh:ro
+      - /share/games/roms:/data/roms
+      - /share/games/dats:/data/dats
+      - /share/games/roms-unverified:/data/roms-unverified
+      - /share/games/roms-verified:/data/roms-verified
+    entrypoint: ["bash", "/data/igir-romm-cleanup.sh"]
+
+    restart: "no"
