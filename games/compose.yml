@@ -29,8 +29,12 @@ services:
       - RETROACHIEVEMENTS_API_KEY=LQxbYcxY9EgrOP7z7WQVo1IjV5TTvjJS
       - STEAMGRIDDB_API_KEY=57b0e5c539b29f20ce61073aa759bdb6
       - HASHEOUS_API_ENABLED=true
+      - LAUNCHBOX_API_ENABLED=true
       - HTTPX_TIMEOUT=30
       - REQUEST_TIMEOUT=30
+      - SCAN_TIMEOUT=1209600
+      - DISABLE_DOWNLOAD_ENDPOINT_AUTH=true
+      - TZ=America/Sao_Paulo
     volumes:
       - /share/docker/romm/resources:/romm/resources
       - /share/docker/romm/redis-data:/redis-data
@@ -84,9 +88,11 @@ services:
     volumes:
       - /share/games/igir-romm-cleanup.sh:/data/igir-romm-cleanup.sh:ro
       - /share/games/roms:/data/roms
+      - /share/games/ingest-roms:/data/ingest-roms
       - /share/games/dats:/data/dats
       - /share/games/roms-unverified:/data/roms-unverified
       - /share/games/roms-verified:/data/roms-verified
+      - /share/games/igir:/data/igir
     entrypoint: ["bash", "/data/igir-romm-cleanup.sh"]
 
     restart: "no"

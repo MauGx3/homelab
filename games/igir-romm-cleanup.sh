@@ -59,4 +59,4 @@ time npx -y igir@latest \
     --only-retail
     # --report-output "/data/igir/report %dddd, %MMMM %Do %YYYY, %h:%mm:%ss %a.csv"
 
-# time igir move extract report test -v -d /data/dats -i /data/roms-unverified -o /data/roms-verified --input-checksum-quick false --input-checksum-min CRC32 --input-checksum-max SHA256 --only-retail --report-output /data/igir/report_%dddd_%MMMM_%Do_%YYYY_%h:%mm:%ss_%a.csv
+# screen igir move report -vvv -d /data/dats -i /data/roms-unverified -o /data/roms-verified/{romm}/ --input-checksum-quick false --input-checksum-min CRC32 --input-checksum-max SHA256 --only-retail --report-output /data/igir/report_%dddd_%MMMM_%Do_%YYYY_%h:%mm:%ss_%a.csv > /data/igir/igir.log
