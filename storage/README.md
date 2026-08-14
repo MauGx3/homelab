@@ -26,7 +26,7 @@ My current setup involves a single server with x3 NVME drives and a bunch of har
 #### Proxmox Community Post-Install Script
 The quickest way to handle post-install tasks is with the [Proxmox VE Post Install script](https://community-scripts.github.io/ProxmoxVE/scripts?id=post-pve-install) from the community scripts project. Run this within the Proxmox shell:
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/post-pve-install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/tools/pve/post-pve-install.sh)"
 ```
 This will disable enterprise repos, add the free repos, remove the subscription nag, and update your system. It will walk you through each step interactively.
 
