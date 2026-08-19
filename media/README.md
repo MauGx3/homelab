@@ -291,7 +291,7 @@ If Gluetun logs show repeated `i/o timeout` errors like `dial tcp 1.1.1.1:853: i
 The default credentials for NZBGet are a username of `nzbget` and a password of `tegbzn6789`. It's strongly recommended to change these default credentials for security reasons. This can be done under _Settings > SECURITY_, then change the ControlUsername and ControlPassword.
 
 #### NZBGet Download Directories
-If following the `/data:/data` directory scheme and used the command to setup the download directories open the qBittorrent Web UI and do under _Settings > PATHS_ and change the paths.
+If following the `/data:/data` directory scheme and used the command to setup the download directories open the NZBGet Web UI and do under _Settings > PATHS_ and change the paths.
 
 _MainDir:_ `/data/downloads/nzbget`
 

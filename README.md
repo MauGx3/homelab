@@ -73,4 +73,4 @@ Currently running two camera systems - originally fully Reolink, but added UniFi
 
 ## Stars
 
-[![Star History Chart](https://api.star-history.com/svg?repos=techhuttv/homelab&type=date&legend=top-left)](https://www.star-history.com/#techhuttv/homelab&type=date&legend=top-left)
+[![Star History Chart](https://star-history.dera.page/svg?repos=techhuttv/homelab&type=date&legend=top-left)](https://star-history.dera.page/#techhuttv/homelab&type=date&legend=top-left)
