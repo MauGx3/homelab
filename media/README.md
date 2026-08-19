@@ -155,6 +155,8 @@ Back in AirVPN navigate to the **Client Area** from here select **Manage** under
 
 The `.env.example` template already contains the variables below. Open the `.env` copy you created earlier and add the information from your downloaded `.conf` file.
 
+`FIREWALL_VPN_INPUT_PORTS` is passed to qBittorrent as `TORRENTING_PORT`. Replace `port` with the numeric port listed on AirVPN's **Ports** page so qBittorrent listens on the same port AirVPN forwards to you.
+
 ```bash
 nano .env
 ```
