@@ -19,28 +19,21 @@ services:
     restart: unless-stopped
 # Remove the Jellyfin service if installed directly on system.
 
-  jellyseerr:
-    container_name: jellyseerr
-    image: fallenbagel/jellyseerr:latest
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Los_Angeles
-    volumes:
-      - ./jellyseerr:/app/config
-    ports:
-      - 5055:5055
-    restart: unless-stopped
-
   jellystat-db:
-    image: postgres:15.2
+    image: postgres:18.1
     container_name: jellystat-db
     restart: unless-stopped
+    shm_size: '1gb'
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_PASSWORD: mypassword # CHANGE ME
     volumes:
-      - ./jellystat/postgres:/var/lib/postgresql/data
+      - ./jellystat/postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --dbname=postgres --username=postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   jellystat:
     image: cyfershepard/jellystat:latest
@@ -48,16 +41,23 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_PASSWORD: mypassword # must match jellystat-db
       POSTGRES_IP: jellystat-db
       POSTGRES_PORT: 5432
-      JWT_SECRET: "my-secret-jwt-key"
+      JWT_SECRET: "my-secret-jwt-key" # CHANGE ME
       TZ: America/Los_Angeles
     volumes:
       - ./jellystat/backup-data:/app/backend/backup-data
     ports:
       - "3000:3000"
     depends_on:
-      - jellystat-db
+      jellystat-db:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:3000/auth/isConfigured || exit 1
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 # Want more!? https://github.com/awesome-jellyfin/awesome-jellyfin

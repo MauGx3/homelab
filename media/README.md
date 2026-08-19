@@ -139,7 +139,7 @@ wget https://github.com/TechHutTV/homelab/raw/refs/heads/main/media/.env.example
 cp .env.example .env
 chmod 600 .env
 ```
-Most of our editing is going to be done in the `.env` file. Here you change your `UID` and `GID`, timezone, and add all your VPN keys and info. You can also make edits to the `compose.yaml` file such as the mount point locations, for example, if you are using something other than `/data:/data` or even changing the docker network IP addresses for your services.
+Most of our editing is going to be done in the `.env` file. Here you change your `UID` and `GID`, timezone, add all your VPN keys and info, and configure the static IP addresses for your services on the `servarrnetwork`. You can also make edits to the `compose.yaml` file such as the mount point locations, for example, if you are using something other than `/data:/data`.
 
 ## Gluetun VPN
 
@@ -169,13 +169,13 @@ VPN_SERVICE_PROVIDER=airvpn
 VPN_TYPE=wireguard
 
 # Mandatory, airvpn forwarded port
-FIREWALL_VPN_INPUT_PORTS=port # mandatory, airvpn forwarded port
+FIREWALL_VPN_INPUT_PORTS=port
 
 # Copy all these variables from your generated configuration file
 WIREGUARD_PUBLIC_KEY=key
 WIREGUARD_PRIVATE_KEY=key
 WIREGUARD_PRESHARED_KEY=key
-WIREGUARD_ADDRESSES=ipv4
+WIREGUARD_ADDRESSES=ip
 
 # Optional location variables, comma separated list, no spaces after commas, make sure it matches the config you created
 # NOTE: These can cause connection failures with some providers. Remove or comment out if Gluetun won't connect.
@@ -184,6 +184,14 @@ WIREGUARD_ADDRESSES=ipv4
 
 # Health check duration
 HEALTH_VPN_DURATION_INITIAL=120s
+
+# Static IPs for services on servarrnetwork
+SET_IP_GLUETUN=172.39.0.2
+SET_IP_SONARR=172.39.0.3
+SET_IP_RADARR=172.39.0.4
+SET_IP_LIDARR=172.39.0.5
+SET_IP_BAZARR=172.39.0.6
+SET_IP_SEERR=172.39.0.7
 ```
 
 ### Testing Gluetun Connectivity
@@ -377,4 +385,4 @@ Once added, Prowlarr will automatically route requests through FlareSolverr for 
 
 ## *arr Apps
 
-When connecting your *arr applications be sure to use the new configured IP addresses in the `servarrnetwork`. We will soon update this section with more text documentation.
+When connecting your *arr applications be sure to use the configured IP addresses from the `.env` file on the `servarrnetwork`. We will soon update this section with more text documentation.

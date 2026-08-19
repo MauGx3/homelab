@@ -1,7 +1,7 @@
 # Compose file for the *arr stack. Configuration files are stored in the
 # directory you launch the compose file on. Change to bind mounts if needed.
 # All containers are ran with user and group ids of the main user and
-# group to aviod permissions issues of downloaded files, please refer
+# group to avoid permissions issues of downloaded files, please refer
 # the read me file for more information.
 
 #############################################################################
@@ -27,7 +27,7 @@ services:
       - /dev/net/tun:/dev/net/tun # If running on an LXC see readme for more info.
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.2
+        ipv4_address: ${SET_IP_GLUETUN}
     ports:
       - 8080:8080 # qbittorrent web interface
       - 6881:6881 # qbittorrent torrent port
@@ -152,7 +152,7 @@ services:
       - 8989:8989
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.3
+        ipv4_address: ${SET_IP_SONARR}
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -170,7 +170,7 @@ services:
       - 7878:7878
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.4
+        ipv4_address: ${SET_IP_RADARR}
 
   lidarr:
     container_name: lidarr
@@ -188,7 +188,7 @@ services:
       - 8686:8686
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.5
+        ipv4_address: ${SET_IP_LIDARR}
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
@@ -206,7 +206,7 @@ services:
       - 6767:6767
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.6
+        ipv4_address: ${SET_IP_BAZARR}
 
   seerr:
     container_name: seerr
@@ -227,7 +227,53 @@ services:
       - ./seerr:/app/config
     ports:
       - 5055:5055
-
     networks:
       servarrnetwork:
-        ipv4_address: 172.39.0.7
+        ipv4_address: ${SET_IP_SEERR}
+
+  # jellystat-db:
+  #   image: postgres:18.1
+  #   container_name: jellystat-db
+  #   restart: unless-stopped
+  #   shm_size: '1gb'
+  #   environment:
+  #     - POSTGRES_USER=${JELLYSTAT_POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${JELLYSTAT_POSTGRES_PASSWORD}
+  #   volumes:
+  #     - ./jellystat/postgres-data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready --dbname=postgres --username=${JELLYSTAT_POSTGRES_USER}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     servarrnetwork:
+  #       ipv4_address: ${SET_IP_JELLYSTAT_DB}
+  #
+  # jellystat:
+  #   image: cyfershepard/jellystat:latest
+  #   container_name: jellystat
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=${JELLYSTAT_POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${JELLYSTAT_POSTGRES_PASSWORD}
+  #     - POSTGRES_IP=jellystat-db
+  #     - POSTGRES_PORT=5432
+  #     - JWT_SECRET=${JELLYSTAT_JWT_SECRET}
+  #     - TZ=${TZ}
+  #   volumes:
+  #     - ./jellystat/backup-data:/app/backend/backup-data
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     jellystat-db:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: wget --no-verbose --tries=1 --spider http://localhost:3000/auth/isConfigured || exit 1
+  #     interval: 60s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 30s
+  #   networks:
+  #     servarrnetwork:
+  #       ipv4_address: ${SET_IP_JELLYSTAT}

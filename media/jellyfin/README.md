@@ -16,7 +16,6 @@ data
 docker
 └── jellyfin
     ├── config
-    ├── jellyseerr
     └── jellystat
 ```
 
@@ -233,6 +232,39 @@ Now to expand the functionality of Jellyfin I recommend these 3rd party tools th
 
 ### Jellystat
 Find it [here](https://github.com/CyferShepard/Jellystat)
+
+#### Upgrading the Jellystat Database (Postgres 15 → 18)
+The `compose.yaml` was updated from `postgres:15.2` to `postgres:18.1`. Postgres can not start on a data directory created by an older major version, so existing installs will see an error similar to `database files are incompatible with server` and the container will crash loop.
+
+> [!CAUTION]
+> Back up your `./jellystat/postgres-data` (formerly `./jellystat/postgres`) directory before doing anything else. The steps below modify it in place.
+
+The simplest path is `pg_dump` on 15, then restore on 18:
+
+1. Bring the new stack down: `docker compose down`
+2. Temporarily pin the DB back to the old image and volume name so it starts. Edit `compose.yaml`:
+   ```yaml
+   jellystat-db:
+     image: postgres:15.2
+     volumes:
+       - ./jellystat/postgres:/var/lib/postgresql/data
+   ```
+3. Start just the DB and dump it:
+   ```bash
+   docker compose up -d jellystat-db
+   docker exec -t jellystat-db pg_dumpall -U postgres > jellystat-backup.sql
+   docker compose down
+   ```
+4. Move the old data directory aside and restore the original `compose.yaml` (postgres:18.1 with the `postgres-data` volume):
+   ```bash
+   mv ./jellystat/postgres ./jellystat/postgres-old
+   docker compose up -d jellystat-db
+   cat jellystat-backup.sql | docker exec -i jellystat-db psql -U postgres
+   docker compose up -d jellystat
+   ```
+5. Once Jellystat reports its data is intact, delete `./jellystat/postgres-old` and `jellystat-backup.sql`.
+
+If you'd rather skip the dump/restore dance, [`pgautoupgrade/pgautoupgrade`](https://github.com/pgautoupgrade/docker-pgautoupgrade) is a drop-in image that runs `pg_upgrade` on first boot and then behaves like a normal Postgres container. Point it at the existing `postgres` volume, let it convert in place, then switch back to `postgres:18.1`.
 
 ## DVR and Live TV
 
