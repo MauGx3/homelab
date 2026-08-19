@@ -160,9 +160,9 @@ To pull the latest images and recreate the containers:
 docker compose pull && docker compose up -d
 ```
 
-The `.env.example` template sets `IMMICH_VERSION=v2`, which pins to the v2 major version after you copy it to `.env`. You'll auto-get minor and patch updates but stay on v2 forever until you bump it manually. This is intentional. Immich does ship breaking schema changes in major releases, so do go check the [release notes](https://github.com/immich-app/immich/releases) before jumping to v3 (or whatever's next).
+The `.env.example` template sets `IMMICH_VERSION=v3`, which tracks stable v3 minor and patch releases after you copy it to `.env`. If you want to pin an exact version for stability, use a full tag such as `v3.0.0` instead.
 
-If you want to pin to an exact version for stability, change `IMMICH_VERSION` to something like `v2.1.0`.
+If you're upgrading an existing v2 installation, update your mobile apps and back up your database and library first. This repo already uses Immich's VectorChord PostgreSQL image, so you do not need to change the database image. Change `IMMICH_VERSION` from `v2` to `v3` in your local `.env`, then run the update commands above. If your existing deployment still uses pgvecto.rs, complete the official [VectorChord migration](https://docs.immich.app/install/upgrading/#migrating-to-vectorchord) before starting v3. Check the full [v3 migration guide](https://immich.app/blog/v3-migration) for removed environment variables and other integration changes.
 
 ### Housekeeping
 - Watch your `UPLOAD_LOCATION` for storage growth. The mobile app will quietly fill it up.
