@@ -7,7 +7,6 @@ Whether you're looking for a complete Servarr media setup behind a VPN, a Frigat
 ## Table of Contents
 
 * [Apps](apps/) - List of all the apps and services.
-* [Automations](automations/) - n8n workflows and automation.
 * [Cloud](cloud/) - NextCloud, Immich, and self-hosted cloud services.
 * [Home Assistant](homeassistant/) - Smart home services and automation.
 * [Media Server](media/) - Plex, Jellyfin, *arr stack, and more.
@@ -24,7 +23,7 @@ Whether you're looking for a complete Servarr media setup behind a VPN, a Frigat
 | | OpnNAS SL-R12 Pro | Miniforum AI X1 Pro |
 |---|---|---|
 | **OS** | Unraid | Proxmox |
-| **Role** | Media server, NextCloud VM | Grafana, NPM, n8n, and other services |
+| **Role** | Media server, NextCloud VM | Grafana, NPM, and other services |
 | **CPU** | [Intel Core i5-13500T](https://amzn.to/4qblt9y) | AMD Ryzen AI 9 HX 370 |
 | **RAM** | [Crucial Pro 96GB DDR5](https://amzn.to/3Jbh2uD) | 96GB SODIMM DDR5 |
 | **Storage** | [5x Seagate Exos 20TB](https://amzn.to/4nPhn5d), [7x Seagate IronWolf 4TB](https://amzn.to/3W1IFt5) | [2x WD SN580 1TB NVMe](https://amzn.to/4hdfHzY) (mirrored boot) |
