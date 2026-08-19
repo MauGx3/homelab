@@ -20,19 +20,23 @@ mkdir -p ~/docker/immich
 cd ~/docker/immich
 ```
 
-Now go ahead and grab the `compose.yaml` and `.env` files from this repo.
+Now go ahead and grab `compose.yaml` and the safe `.env.example` template from this repo. Copy the template to `.env`, restrict its permissions, and then edit your local values.
 
 ```bash
-wget https://github.com/TechHutTV/homelab/raw/refs/heads/main/cloud/immich/compose.yaml && wget https://github.com/TechHutTV/homelab/raw/refs/heads/main/cloud/immich/.env
+wget https://github.com/TechHutTV/homelab/raw/refs/heads/main/cloud/immich/compose.yaml
+wget https://github.com/TechHutTV/homelab/raw/refs/heads/main/cloud/immich/.env.example
+cp .env.example .env
+chmod 600 .env
 ```
 
 ### Configure the .env File
+
 ```bash
 nano .env
 ```
 
 **You have to change these:**
-- `DB_PASSWORD` — Set this to a random strong password. Stick to `A-Za-z0-9` so Docker doesn't choke on special characters. The default is intentionally broken so the stack won't start until you change it.
+- `DB_PASSWORD` — Set this to a random strong password before deploying. Stick to `A-Za-z0-9` so Docker doesn't choke on special characters. The placeholder is syntactically valid and does not prevent startup by itself.
 - `TZ` — Set your [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List).
 - `UPLOAD_LOCATION` — Where your photos and videos will live. Network shares are fine here.
 - `DB_DATA_LOCATION` — Where the Postgres database lives. Do **not** put this on a network share, Immich will not be happy.
@@ -156,9 +160,9 @@ To pull the latest images and recreate the containers:
 docker compose pull && docker compose up -d
 ```
 
-The `.env` ships with `IMMICH_VERSION=v2`, which pins to the v2 major version. You'll auto-get minor and patch updates but stay on v2 forever until you bump it manually. This is intentional. Immich does ship breaking schema changes in major releases, so do go check the [release notes](https://github.com/immich-app/immich/releases) before jumping to v3 (or whatever's next).
+The `.env.example` template sets `IMMICH_VERSION=v3`, which tracks stable v3 minor and patch releases after you copy it to `.env`. If you want to pin an exact version for stability, use a full tag such as `v3.0.0` instead.
 
-If you want to pin to an exact version for stability, change `IMMICH_VERSION` to something like `v2.1.0`.
+If you're upgrading an existing v2 installation, update your mobile apps and back up your database and library first. This repo already uses Immich's VectorChord PostgreSQL image, so you do not need to change the database image. Change `IMMICH_VERSION` from `v2` to `v3` in your local `.env`, then run the update commands above. If your existing deployment still uses pgvecto.rs, complete the official [VectorChord migration](https://docs.immich.app/install/upgrading/#migrating-to-vectorchord) before starting v3. Check the full [v3 migration guide](https://immich.app/blog/v3-migration) for removed environment variables and other integration changes.
 
 ### Housekeeping
 - Watch your `UPLOAD_LOCATION` for storage growth. The mobile app will quietly fill it up.
